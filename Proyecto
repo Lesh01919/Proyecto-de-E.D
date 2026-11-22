@@ -1,0 +1,40 @@
+import numpy as np
+
+
+def heun(f, t0, tf, y0, h):
+    """
+    Devuelve los tiempos y las soluciones aproximadas.
+    """
+    if h <= 0 or tf <= t0:
+        raise ValueError("Se necesita h > 0 y tf > t0.")
+
+    # Calculamos el número de pasos
+    pasos = (tf - t0) / h
+    n = int(round(pasos))
+
+    if n < 1 or not np.isclose(pasos, n):
+        raise ValueError("El paso h debe dividir el intervalo.")
+
+    # Creamos el arreglo de tiempos
+    t = np.linspace(t0, tf, n + 1)
+
+    # Cada fila guarda el estado en un instante
+    y = np.zeros((n + 1, len(y0)))
+
+    # Guardamos las condiciones iniciales
+    y[0] = y0
+
+    for j in range(n):
+        # Pendiente al inicio
+        k1 = np.array(f(t[j], y[j]), dtype=float)
+
+        # Predictor: aproximación con Euler
+        predictor = y[j] + h * k1
+
+        # Pendiente en el punto predicho
+        k2 = np.array(f(t[j + 1], predictor), dtype=float)
+
+        # Corrector: promedio de las pendientes
+        y[j + 1] = y[j] + (h / 2) * (k1 + k2)
+
+    return t, y
